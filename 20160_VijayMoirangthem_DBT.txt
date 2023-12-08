@@ -1,0 +1,493 @@
+MYSQL
+
+Create,Insert,Update,Delete
+
+
+create table Course(
+CourseID varchar(10) primary key,
+CourseName varchar(20),
+CourseFee int,
+CourseDuration int
+) ;
+
+create table Student(
+StudentID varchar(10) primary key,
+StudentName varchar(20),
+StudentAddress varchar(50),
+StudentDOB date,
+StudentGender enum('M','F'),
+StudentGuardianName varchar(20),
+StudentMobNo varchar(15),
+StudentEmailID varchar(30),
+StudentCourseID varchar(10),
+foreign key (StudentCourseID) references Course(CourseID)
+) ;
+
+create table Hostel(
+   HostelID varchar(10) primary key,
+   HostelRoomNo varchar(10),
+   HostelStudentID varchar(10),
+   HostelFee int
+);
+
+create table exam (
+  ExamID int auto_increment primary key,
+  ExamDate date ,
+  ExamSub varchar(50)
+);
+
+create table Employee(
+   EmpID varchar(10) primary key,
+   EmpName varchar(20),
+   EmpType varchar(50),
+   EmpSal int not null
+);
+
+create table Lecture(
+  LectureID varchar(10) primary key,
+  LectureDate date,
+  LectureName varchar(20),
+  EmpsID varchar(10),
+  foreign key (EmpsID) references Employee(EmpID)  /*same datatype for foreign key*/
+);
+
+create table CourseBkp(
+BKPCourseID varchar(10) primary key,
+BKPCourseName varchar(20),
+BKPCourseFee int,
+BKPCourseDuration int
+) ;
+
+insert into Course values ('C6' , 'PG-DITIS' , '90000' , '6');
+
+insert into Student values ('S6' , 'Sonam Gupta' , 'Bombay' , '1985/02/21' , 'F' ,'SG', '111111111' , 'SG@gmail.com' , 'C3');
+
+insert into Hostel values ('H003' ,'F04' , 'S4' , 63000 );
+
+insert into Employee values ('E005' ,  'Laksh' , 'Assistant Professor' , 20000);
+
+insert into Lecture values ('L002' ,  '2023/10/03' , 'C++' , 'E004');
+
+update Course set CourseName = 'PG-DITIS' where CourseID = 'C4';
+
+update Hostel set HostelFee = 63000 where HostelID = 'H003';
+
+delete from Course where CoursesID = 'C5';
+
+delete from Course where CourseID = 'C4';
+
+-----------------------------------------------------------------------------------------
+
+
+PK, FK, Check, Unique, Not Null
+
+create table Lecture(
+  LectureID varchar(10) primary key,
+  LectureDate date,
+  LectureName varchar(20),
+  EmpsID varchar(10),
+  foreign key (EmpsID) references Employee(EmpID)  /*same datatype for foreign key*/
+);
+
+create table Hostel(
+   HostelID varchar(10) primary key,
+   HostelRoomNo varchar(10),
+   HostelStudentID varchar(10),
+   HostelFee int,
+   check (HostelFee = 63000)
+);
+
+alter table Course
+add unique (CourseName);
+
+create table Employee(
+   EmpID varchar(10) primary key,
+   EmpName varchar(20),
+   EmpType varchar(50),
+   EmpSal int not null
+);
+
+
+
+-----------------------------------------------------------------------------------------
+Alter,Truncate,Drop
+
+Alter table Exam add ExamSub varchar(50);
+
+alter table Hostel
+ Add foreign key(HostelstudentID) references Student(StudentID) ;
+
+truncate table exam;
+
+Drop table exam;
+
+
+-----------------------------------------------------------------------------------------
+Grant, Revoke, 
+
+
+grant select on collegemanagementsystem.Student  to 'SDM'@'LocalHost' ;
+
+revoke select  on collegemanagementsystem.Student  from 'SDM'@'LocalHost' ;
+
+
+
+-----------------------------------------------------------------------------------------
+Rollback, Commit , Save Point
+
+
+savepoint firstsave;
+
+rollback;
+
+set AutoCommit = 0;
+commit;
+
+
+
+
+
+-----------------------------------------------------------------------------------------
+Auto Increment
+
+create table exam (
+  ExamID int auto_increment primary key,
+  ExamDate date ,
+  ExamSub varchar(50)
+);
+-----------------------------------------------------------------------------------------
+Copying Table with data
+
+
+insert into Studentcopy (select * from Student);
+
+-----------------------------------------------------------------------------------------
+Copying Structure
+
+
+create table StudentCopy like Student;
+-----------------------------------------------------------------------------------------
+Where 
+
+
+select * from Student where StudentCourseID = 'C1';
+-----------------------------------------------------------------------------------------
+OR, AND
+
+
+
+select * from Student where StudentCourseID = 'C1' or StudentCourseID = 'C3';
+
+select * from Student where StudentCourseID = 'C1' and StudentGender = 'M';
+
+-----------------------------------------------------------------------------------------
+IN, NOT IN
+
+
+select * from Student where StudentCourseID in ('C1','C3');
+
+select * from Student where StudentCourseID not in ('C1','C3');
+
+-----------------------------------------------------------------------------------------
+BETWEEN
+
+select * from Course where CourseFee between 90000 and 150000;
+-----------------------------------------------------------------------------------------
+DISTINCT
+
+select distinct StudentCourseID from Student;
+-----------------------------------------------------------------------------------------
+InBuilt Functions - Min, Max, Count, Average
+
+select  EmpName from Employee where EmpSal = (select max(EmpSal) from Employee);
+
+select  EmpName from Employee where EmpSal = (select min(EmpSal) from Employee);
+
+select count(CourseID) from Course;
+
+select avg(CourseFee) from Course;
+
+
+-----------------------------------------------------------------------------------------
+Order By
+
+select * from Course order by CourseFee;
+
+select * from Course order by CourseFee desc;
+-----------------------------------------------------------------------------------------
+Like using % , _
+
+select * from Student where StudentName like 'S%';
+
+select * from Student where StudentName like '_____';
+
+-----------------------------------------------------------------------------------------
+Limit
+
+select * from Course where CourseFee limit 3;
+-----------------------------------------------------------------------------------------
+Group By
+
+select * from Course group by CourseFee;
+-----------------------------------------------------------------------------------------
+Joins
+
+select * from Lecture join Employee on Lecture.EmpsID = Employee.EmpID;
+-----------------------------------------------------------------------------------------
+Subquery/Nested query
+
+select  EmpName from Employee where EmpSal = (select min(EmpSal) from Employee);
+
+-----------------------------------------------------------------------------------------
+Exists / Not Exists
+select * from student where exists (select HostelStudentID from Hostel where Hostel.HostelStudentID = Student.StudentID);
+
+select * from student where not exists (select HostelStudentID from Hostel where Hostel.HostelStudentID = Student.StudentID);
+
+-----------------------------------------------------------------------------------------
+Union, Intersection, Minus
+
+select * from Student union select * from StudentCopy;  /*Union*/
+
+select distinct * from Student join StudentCopy where Student.StudentID = StudentCopy.StudentID; /* intersection */
+
+select distinct * from Student join StudentCopy using (StudentID)  where StudentCopy.StudentID is null; /* minus */
+
+-----------------------------------------------------------------------------------------
+View
+
+
+create view View_Get as
+select * from student where StudentGender = 'M';
+
+select * from View_Get;
+-----------------------------------------------------------------------------------------
+Temporary Table
+
+create temporary table ExamTemp(
+ExamID varchar(10),
+ExamDate date
+);
+-----------------------------------------------------------------------------------------
+Index
+
+create index Ind_Stud on Student(StudentID);
+show indexes from Student;
+-----------------------------------------------------------------------------------------
+Function
+
+delimiter $
+create function Func_VM ()
+returns int
+begin 
+declare a2 int;
+set a2 = (select max(CourseFee) from Course);
+return a2;
+end $
+delimiter ;
+
+select Func_VM();
+
+delimiter /
+create function Func_Counts () 
+returns int
+begin
+declare a1 int;
+set a1 = (select count(StudentID) from Student);
+return a1;
+end/
+delimiter ;
+
+select Func_Counts();
+
+-----------------------------------------------------------------------------------------
+Procedure
+
+delimiter /
+create procedure Proc_Insert(
+CourseID varchar(10),
+CourseName varchar(20),
+CourseFee int,
+CourseDuration int
+)
+begin 
+insert into Course values (CourseID , CourseName , CourseFee , CourseDuration);
+end/
+delimiter ;
+call Proc_Insert('C5' , 'PG-DAI' , '90000' , '6');
+
+delimiter %%
+create procedure Proc_delete (
+CoursesID varchar(5))
+begin
+delete from Course where CoursesID = CourseID;
+end %%
+delimiter ; 
+drop procedure Proc_delete;
+call Proc_delete('C5');
+-----------------------------------------------------------------------------------------
+Exception Handling
+
+delimiter /
+create procedure Proc_Insert12(
+CourseID varchar(10),
+CourseName varchar(20),
+CourseFee int,
+CourseDuration int
+)
+BEGIN
+ DECLARE EXIT HANDLER FOR 1062
+    BEGIN
+ 	select ('Duplicate CourseID')
+    END;
+ insert into Course values (CourseID , CourseName , CourseFee , CourseDuration); 
+
+end;
+delimiter ;
+
+call Proc_Insert12('C5' , 'PG-DAI' , '90000' , '6');
+-----------------------------------------------------------------------------------------
+Loops - While Do, Repeat, Loop, Cursor
+
+delimiter //
+create procedure func_loopwhiledo()
+begin
+declare counter int ;
+set counter=1;
+while ( counter <= 10)
+do
+select ('loop ran' );
+set counter  = counter  + 1;
+end while;
+end //
+delimiter ;
+
+
+
+delimiter //
+create procedure Func_Looprepeat()
+begin
+declare counter int ;
+set counter=1;
+repeat
+select ('loop ran' );
+set counter  = counter  + 1;
+until counter <= 10
+end repeat;
+end //
+delimiter ;
+
+
+delimiter //
+create procedure func_looploop()
+begin
+declare counter int default 1;
+my_loop: loop
+if counter > 10 then
+leave my_loop;
+end if;
+select ('loop ran' );
+set counter = counter + 1;
+end loop my_loop;
+end //
+delimiter ;
+
+
+delimiter //
+create procedure proc_cursor()
+   begin
+      declare done int default 0;
+      declare coursefee int;
+      declare courseduration int;
+      declare courseid, coursename varchar(20);
+      declare cur cursor for select * from course;
+      declare continue handler for not found set done = 1;
+      open cur;
+      label: loop
+      fetch cur into courseid,coursename, coursefee, courseduration;
+      insert into coursebkp values(courseid, coursename,coursefee, courseduration);
+      if done = 1 then leave label;
+      end if;
+      end loop;
+      close cur;
+   end//
+delimiter ;
+
+-----------------------------------------------------------------------------------------
+Trigger
+
+delimiter ^
+create Trigger TRIG_BKP 
+before delete on Course 
+for each row  
+begin
+insert into CourseBkp values (old.CourseID, old.CourseName ,old.CourseFee,old.CourseDuration ) ;
+end ^
+delimiter ; 
+-----------------------------------------------------------------------------------------
+
+
+
+MONGODB
+
+mongoImport --db ClgManagementSystem --collection Student --type csv-- file  "C:\Users\Vijay\Desktop\Extras\Bluetooth\assignment1\DBT\Course.csv"  --headerline
+mongoImport --db ClgManagementSystem --collection Course --type csv-- file  "C:\Users\Vijay\Desktop\Extras\Bluetooth\assignment1\DBT\Student.csv"  --headerline
+
+use ClgManagementSystem
+
+db
+
+show collections
+
+db.createCollection('Student')
+
+db.Course.insert({CourseID:'C6' , CourseName:'PG-DMC' , CourseFee:'90000' , CourseDuration:'6'})
+
+db.Course.find().pretty()
+
+db.Course.drop()
+
+var bulk = db.Course.initializeUnorderedBulkOp();
+bulk.insert({CourseID:'C7' , CourseName:'PG-DMaC' , CourseFee:'90000' , CourseDuration:'6'});
+bulk.insert({CourseID:'C8' , CourseName:'PG-DMiC' , CourseFee:'90000' , CourseDuration:'6'});
+bulk.execute();
+
+db.Course.find().pretty().limit(2)
+
+db.Course.find().pretty().skip(2)
+
+db.Course.find({},{_id:0 , CourseName:1 , CourseFee:1}).pretty()
+
+db.Student.find({StudentGender:'F'},{_id:0 , StudentName:1 , StudentGender:1}).pretty()
+
+db.Student.find({StudentGender:'F' , StudentCourseId:'C3'},{_id:0 , StudentName:1 , StudentGender:1}).pretty()
+
+db.Student.find({$or:[{StudentGender:'F'} ,{ StudentCourseId:'C3'}]},{_id:0 , StudentName:1 , StudentGender:1}).pretty()
+
+db.Course.find({CourseFee:{$lt:100000}},{}).pretty()
+
+db.Course.find({CourseFee:{$gt:100000}},{}).pretty()
+
+db.Course.find({CourseFee:{$lte:100000}},{}).pretty()
+
+db.Course.find({CourseFee:{$gte:100000}},{}).pretty()
+
+db.Course.find({},{_id:0 , CourseName:1 , CourseFee:1}).sort({CourseFee:1})
+
+db.Course.find({},{_id:0 , CourseName:1 , CourseFee:1}).sort({CourseFee:-1})
+
+db.Course.aggregate([{$group:{_id:'$CourseName'}}])
+
+db.Course.aggregate([{$group:{_id:'$CourseName', avrgCost:{$avg:'$CourseFee'}}}])
+
+db.Course.findAndModify({query:{CourseName:'PG-DAC'} , update:{CourseFee:100000}})
+
+db.Course.updateMany({CourseName:'PG-DMiC'},{$set:{CourseFee:100000}})
+
+db.Course.updateMany({CourseName:'PG-DMaC'},{$unset:{CourseFee:80000}})
+
+db.Course.deleteOne({CourseName:'PG-DMaC'})
+
+db.Course.deleteMany({CourseName:'PG-DMaC'})
+
+db.Course.remove({CourseName:'PG-DMaC'})
